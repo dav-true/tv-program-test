@@ -42,6 +42,13 @@ class MainActivity : AppCompatActivity(), ItemClickListener {
             layoutManager = LinearLayoutManager(context)
             adapter = with(programAdapter) {
                 clickListener = this@MainActivity
+                addLoadStateListener {
+                    if (itemCount > 0) {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            binding.loading.visibility = View.GONE
+                        }
+                    }
+                }
                 withLoadStateHeaderAndFooter(
                     header = LoadingStateAdapter(this),
                     footer = LoadingStateAdapter(this)
@@ -53,10 +60,6 @@ class MainActivity : AppCompatActivity(), ItemClickListener {
 
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.getProgram()
-                .onEach {
-                    binding.loading.visibility = View.GONE
-                }
-                .flowOn(Dispatchers.Main)
                 .collectLatest { pagingData ->
                     programAdapter.submitData(pagingData)
                 }
