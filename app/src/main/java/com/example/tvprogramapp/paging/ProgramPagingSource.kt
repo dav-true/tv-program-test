@@ -47,8 +47,8 @@ class ProgramPagingSource(
 
             LoadResult.Page(
                 data = movies,
-                prevKey = pageIndex - 1,
-                nextKey = nextPageNumber
+                prevKey = if (response.offset > 0) pageIndex - 1 else null,
+                nextKey = if (response.hasMore > 0) nextPageNumber else null
             )
         } catch (exception: IOException) {
             return LoadResult.Error(exception)
